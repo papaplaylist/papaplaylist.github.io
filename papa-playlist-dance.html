@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Papa Playlist Dance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fff9c4 0%, #ffe0f0 50%, #d0f0ff 100%);
+      font-family: 'Nunito', sans-serif;
+      gap: 1.5rem;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.8rem;
+      color: #ff5c8a;
+      text-align: center;
+      letter-spacing: 0.03em;
+      text-shadow: 3px 3px 0px #ffd6e8, 5px 5px 0px rgba(255,92,138,0.15);
+      animation: bounce 1.5s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .stars {
+      font-size: 1.4rem;
+      text-align: center;
+      animation: spin-stars 3s linear infinite;
+      letter-spacing: 8px;
+    }
+
+    @keyframes spin-stars {
+      0%   { letter-spacing: 8px; }
+      50%  { letter-spacing: 16px; }
+      100% { letter-spacing: 8px; }
+    }
+
+    .gif-container {
+      border: 4px solid #ffb3d1;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 30px rgba(255, 92, 138, 0.2), 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .gif-container:hover {
+      transform: scale(1.02) rotate(1deg);
+    }
+
+    .gif-container img {
+      display: block;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    #now-playing {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #b06aaa;
+      text-align: center;
+      min-height: 1.4em;
+      background: rgba(255,255,255,0.7);
+      padding: 6px 16px;
+      border-radius: 20px;
+      transition: all 0.3s;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 0.65rem 1.5rem;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+    }
+
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+    }
+
+    #btn-random {
+      background: #ff5c8a;
+      color: #fff;
+    }
+
+    #btn-random:hover { background: #ff3d75; }
+
+    #btn-next {
+      background: #ffcc00;
+      color: #7a5a00;
+    }
+
+    #btn-next:hover { background: #f5c200; }
+
+    audio {
+      width: 100%;
+      margin-top: 0.25rem;
+      border-radius: 12px;
+    }
+
+    .song-list {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255,255,255,0.65);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 2px solid #ffd6e8;
+    }
+
+    .song-list h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      color: #ff5c8a;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.04em;
+    }
+
+    .song-list ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .song-list li {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #aaa;
+      padding: 5px 10px;
+      border-radius: 10px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .song-list li.playing {
+      color: #ff5c8a;
+      background: rgba(255, 92, 138, 0.1);
+    }
+
+    .song-list li::before {
+      content: "🎵  ";
+    }
+
+    .song-list li.playing::before {
+      content: "▶️  ";
+    }
+
+    .confetti {
+      position: fixed;
+      top: -20px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: fall linear forwards;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars">🌟 🎉 🌟 🎉 🌟</div>
+
+  <h1>Papa Playlist Dance! 🕺</h1>
+
+  <div class="gif-container">
+    <img id="dancer-gif" src="dance1.gif" alt="Papa dancing" />
+  </div>
+
+  <div class="player">
+    <div id="now-playing">Press ▶ to get the party started! 🎶</div>
+    <div class="controls">
+      <button id="btn-random" onclick="playRandom()">▶ Let's Dance!</button>
+      <button id="btn-next" onclick="nextSong()">⏭ Next Song</button>
+    </div>
+    <audio id="audio-player" controls onended="nextSong()"></audio>
+  </div>
+
+  <div class="song-list">
+    <h2>🎵 The Playlist</h2>
+    <ul id="playlist"></ul>
+  </div>
+
+  <script>
+    /*
+      ─────────────────────────────────────────
+       ADD YOUR SONGS HERE
+       Use filenames relative to this HTML file,
+       e.g. "song1.mp3" or "music/banger.mp3"
+      ─────────────────────────────────────────
+    */
+    const songs = [
+      { title: "Song One",   src: "song1.mp3"   },
+      { title: "Song Two",   src: "song2.mp3"   },
+      { title: "Song Three", src: "song3.mp3"   },
+    ];
+
+    const gifs = ["dance1.gif", "dance2.gif"];
+
+    let currentIndex = -1;
+    const audio = document.getElementById('audio-player');
+    const nowPlaying = document.getElementById('now-playing');
+    const playlist = document.getElementById('playlist');
+    const dancerGif = document.getElementById('dancer-gif');
+
+    function buildPlaylist() {
+      playlist.innerHTML = '';
+      songs.forEach((song, i) => {
+        const li = document.createElement('li');
+        li.textContent = song.title;
+        li.id = `track-${i}`;
+        playlist.appendChild(li);
+      });
+    }
+
+    function setActive(index) {
+      document.querySelectorAll('#playlist li').forEach(li => li.classList.remove('playing'));
+      const active = document.getElementById(`track-${index}`);
+      if (active) active.classList.add('playing');
+    }
+
+    function randomGif() {
+      const pick = gifs[Math.floor(Math.random() * gifs.length)];
+      dancerGif.src = pick + '?t=' + Date.now();
+    }
+
+    function playSong(index) {
+      currentIndex = index;
+      const song = songs[index];
+      audio.src = song.src;
+      audio.play();
+      nowPlaying.textContent = '🎶  ' + song.title;
+      setActive(index);
+      randomGif();
+      launchConfetti();
+    }
+
+    function playRandom() {
+      if (songs.length === 0) return;
+      const index = Math.floor(Math.random() * songs.length);
+      playSong(index);
+    }
+
+    function nextSong() {
+      if (songs.length === 0) return;
+      const index = Math.floor(Math.random() * songs.length);
+      playSong(index);
+    }
+
+    function launchConfetti() {
+      const colors = ['#ff5c8a','#ffcc00','#5bc8ff','#a8e063','#ff9f43','#d4a4ff'];
+      for (let i = 0; i < 28; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.width = (6 + Math.random() * 8) + 'px';
+        el.style.height = (6 + Math.random() * 8) + 'px';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }
+    }
+
+    buildPlaylist();
+  </script>
+
+</body>
+</html>
