@@ -202,7 +202,7 @@
   <h1>Papa Playlist Dance! 🕺</h1>
 
   <div class="gif-container">
-    <img id="dancer-gif" src="dance1.gif" alt="Papa dancing" />
+    <img id="dancer-gif" src="" alt="Papa dancing" style="min-height:200px;" />
   </div>
 
   <div class="player">
@@ -220,26 +220,57 @@
   </div>
 
   <script>
-    /*
-      ─────────────────────────────────────────
-       ADD YOUR SONGS HERE
-       Use filenames relative to this HTML file,
-       e.g. "song1.mp3" or "music/banger.mp3"
-      ─────────────────────────────────────────
-    */
-    const songs = [
-      { title: "Song One",   src: "song1.mp3"   },
-      { title: "Song Two",   src: "song2.mp3"   },
-      { title: "Song Three", src: "song3.mp3"   },
-    ];
+    // ─────────────────────────────────────────
+    // CONFIGURE YOUR GITHUB REPO HERE
+    // ─────────────────────────────────────────
+    const GITHUB_OWNER = 'papaplaylist';  // e.g. 'johnsmith'
+    const GITHUB_REPO  = 'papaplaylist.github.io';          // your repo name
+    // ─────────────────────────────────────────
+    // Put .gif files in the  /gifs/  folder
+    // Put .mp3 files in the  /songs/ folder
+    // ─────────────────────────────────────────
 
-    const gifs = ["dance1.gif", "dance2.gif"];
-
+    let songs = [];
+    let gifs  = [];
     let currentIndex = -1;
-    const audio = document.getElementById('audio-player');
+
+    const audio      = document.getElementById('audio-player');
     const nowPlaying = document.getElementById('now-playing');
-    const playlist = document.getElementById('playlist');
-    const dancerGif = document.getElementById('dancer-gif');
+    const playlist   = document.getElementById('playlist');
+    const dancerGif  = document.getElementById('dancer-gif');
+
+    async function loadAssets() {
+      const apiBase = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents`;
+      try {
+        const [gifRes, songRes] = await Promise.all([
+          fetch(`${apiBase}/gifs`),
+          fetch(`${apiBase}/songs`)
+        ]);
+        if (gifRes.ok) {
+          const gifFiles = await gifRes.json();
+          gifs = gifFiles
+            .filter(f => f.type === 'file' && /\.gif$/i.test(f.name))
+            .map(f => f.download_url);
+        }
+        if (songRes.ok) {
+          const songFiles = await songRes.json();
+          songs = songFiles
+            .filter(f => f.type === 'file' && /\.mp3$/i.test(f.name))
+            .map(f => ({ title: f.name.replace(/\.mp3$/i, '').replace(/[-_]/g, ' '), src: f.download_url }));
+        }
+      } catch (e) {
+        console.warn('Could not load assets from GitHub API:', e);
+      }
+      if (gifs.length === 0 || songs.length === 0) {
+        nowPlaying.textContent = gifs.length === 0 && songs.length === 0
+          ? '⚠️ No GIFs or songs found — add files to /gifs/ and /songs/ folders!'
+          : gifs.length === 0
+          ? '⚠️ No GIFs found — add .gif files to the /gifs/ folder!'
+          : '⚠️ No songs found — add .mp3 files to the /songs/ folder!';
+      }
+      buildPlaylist();
+      randomGif();
+    }
 
     function buildPlaylist() {
       playlist.innerHTML = '';
@@ -258,6 +289,7 @@
     }
 
     function randomGif() {
+      if (gifs.length === 0) return;
       const pick = gifs[Math.floor(Math.random() * gifs.length)];
       dancerGif.src = pick + '?t=' + Date.now();
     }
@@ -301,7 +333,7 @@
       }
     }
 
-    buildPlaylist();
+    loadAssets();
   </script>
 
 </body>
