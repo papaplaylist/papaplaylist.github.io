@@ -353,6 +353,12 @@
       showGif();
     }
 
+    function restartGif() {
+      const src = dancerGif.src;
+      dancerGif.src = '';
+      dancerGif.src = src;
+    }
+
     function playSong(index) {
       currentIndex = index;
       const song = songs[index];
@@ -360,6 +366,7 @@
       audio.play();
       nowPlaying.textContent = '🎶  ' + song.title;
       setActive(index);
+      restartGif();
       launchConfetti();
     }
 
