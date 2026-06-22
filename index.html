@@ -256,7 +256,7 @@
           const songFiles = await songRes.json();
           songs = songFiles
             .filter(f => f.type === 'file' && /\.mp3$/i.test(f.name))
-            .map(f => ({ title: f.name.replace(/\.mp3$/i, '').replace(/[-_]/g, ' '), src: f.download_url }));
+            .map(f => ({ title: f.name.replace(/\.mp3$/i, '').replace(/\s*\(SPOTISAVER\)/gi, '').trim(), src: f.download_url }));
         }
       } catch (e) {
         console.warn('Could not load assets from GitHub API:', e);
@@ -288,10 +288,17 @@
       if (active) active.classList.add('playing');
     }
 
+    let lastGifIndex = -1;
     function randomGif() {
       if (gifs.length === 0) return;
-      const pick = gifs[Math.floor(Math.random() * gifs.length)];
-      dancerGif.src = pick + '?t=' + Date.now();
+      let idx;
+      if (gifs.length === 1) {
+        idx = 0;
+      } else {
+        do { idx = Math.floor(Math.random() * gifs.length); } while (idx === lastGifIndex);
+      }
+      lastGifIndex = idx;
+      dancerGif.src = gifs[idx];
     }
 
     function playSong(index) {
