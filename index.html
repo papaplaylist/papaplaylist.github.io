@@ -119,6 +119,13 @@
 
     #btn-next:hover { background: #f5c200; }
 
+    #btn-gif {
+      background: #5bc8ff;
+      color: #00527a;
+    }
+
+    #btn-gif:hover { background: #3db8f5; }
+
     audio {
       width: 100%;
       margin-top: 0.25rem;
@@ -199,15 +206,16 @@
   </div>
 
   <div class="player">
-    <div id="now-playing">Loading... 🎶</div>
+    <div id="now-playing">Laden... 🎶</div>
     <div class="controls">
-      <button id="btn-next" onclick="nextSong()">⏭ Next Song</button>
+      <button id="btn-next" onclick="nextSong()">⏭ Volgende papa nummer</button>
+      <button id="btn-gif" onclick="nextGif()">🧥 Nieuwe jas</button>
     </div>
     <audio id="audio-player" controls onended="nextSong()"></audio>
   </div>
 
   <div class="song-list">
-    <h2>🎵 The Playlist</h2>
+    <h2>🎵 De Playlist</h2>
     <ul id="playlist"></ul>
   </div>
 
@@ -261,7 +269,7 @@
           : '⚠️ No songs found — add .mp3 files to the /songs/ folder!';
       }
       buildPlaylist();
-      randomGif();
+      showGif();
       if (songs.length > 0) playRandom();
     }
 
@@ -281,17 +289,16 @@
       if (active) active.classList.add('playing');
     }
 
-    let lastGifIndex = -1;
-    function randomGif() {
+    let currentGifIndex = 0;
+    function showGif() {
       if (gifs.length === 0) return;
-      let idx;
-      if (gifs.length === 1) {
-        idx = 0;
-      } else {
-        do { idx = Math.floor(Math.random() * gifs.length); } while (idx === lastGifIndex);
-      }
-      lastGifIndex = idx;
-      dancerGif.src = gifs[idx];
+      dancerGif.src = gifs[currentGifIndex];
+    }
+
+    function nextGif() {
+      if (gifs.length === 0) return;
+      currentGifIndex = (currentGifIndex + 1) % gifs.length;
+      showGif();
     }
 
     function playSong(index) {
@@ -301,7 +308,6 @@
       audio.play();
       nowPlaying.textContent = '🎶  ' + song.title;
       setActive(index);
-      randomGif();
       launchConfetti();
     }
 
